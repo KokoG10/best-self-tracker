@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>Your best self tracker</title>
+    
+    <!-- PWA & iOS Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Best Self Tracker">
+    <meta name="theme-color" content="#0071e3">
+    <meta name="description" content="Track your non-negotiables and build daily discipline with smart scoring and AI suggestions">
+    
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%230071e3' width='180' height='180' rx='40'/><text x='90' y='90' font-size='110' font-weight='bold' fill='%23fff' text-anchor='middle' dominant-baseline='middle'>S</text></svg>">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%230071e3' width='100' height='100'/><text x='50' y='50' font-size='70' font-weight='bold' fill='%23fff' text-anchor='middle' dominant-baseline='middle'>S</text></svg>">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>Your best self tracker</h1>
+            <p class="date-display" id="dateDisplay"></p>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Left Panel - Non-Negotiables -->
+            <section class="left-panel">
+                <div class="panel-header">
+                    <h2>🔥 Non-Negotiables</h2>
+                    <span class="count-badge" id="nonNegotiableCount">0/5</span>
+                </div>
+                <p class="section-subtitle">Maximum 5 tasks - These must be done today!</p>
+
+                <!-- Add Non-Negotiable Form -->
+                <div class="form-group">
+                    <input type="text" id="nonNegotiableInput" placeholder="Add a non-negotiable task..." class="task-input">
+                    <div class="weight-input-group">
+                        <label for="nonNegotiableWeight">Weight (1-10):</label>
+                        <input type="number" id="nonNegotiableWeight" min="1" max="10" value="5" class="weight-input">
+                    </div>
+                    <button onclick="addNonNegotiable()" class="btn btn-primary">Add Non-Negotiable</button>
+                </div>
+
+                <!-- Non-Negotiables List -->
+                <div class="tasks-list" id="nonNegotiablesList"></div>
+
+                <!-- Non-Negotiables Score -->
+                <div class="score-box">
+                    <p class="score-label">Non-Negotiable Score</p>
+                    <p class="score-value" id="nonNegotiableScore">0/0</p>
+                </div>
+            </section>
+
+            <!-- Right Panel - Good to Do -->
+            <section class="right-panel">
+                <div class="panel-header">
+                    <h2>✨ Good to Do</h2>
+                    <span class="count-badge" id="goodToDoCount">0</span>
+                </div>
+                <p class="section-subtitle">Nice-to-have tasks for extra points!</p>
+
+                <!-- Add Good to Do Form -->
+                <div class="form-group">
+                    <input type="text" id="goodToDoInput" placeholder="Add a good to do task..." class="task-input">
+                    <div class="weight-input-group">
+                        <label for="goodToDoWeight">Weight (1-5):</label>
+                        <input type="number" id="goodToDoWeight" min="1" max="5" value="3" class="weight-input">
+                    </div>
+                    <button onclick="addGoodToDo()" class="btn btn-secondary">Add Good to Do</button>
+                </div>
+
+                <!-- Good to Do List -->
+                <div class="tasks-list" id="goodToDoList"></div>
+
+                <!-- Good to Do Score -->
+                <div class="score-box">
+                    <p class="score-label">Good to Do Score</p>
+                    <p class="score-value" id="goodToDoScore">0/0</p>
+                </div>
+            </section>
+        </div>
+
+        <!-- Dashboard Section -->
+        <section class="dashboard">
+            <div class="dashboard-header">
+                <h2>📊 Daily Progress Dashboard</h2>
+            </div>
+
+            <div class="dashboard-content">
+                <!-- Daily Score -->
+                <div class="dashboard-card">
+                    <h3>Today's Score</h3>
+                    <div class="score-display">
+                        <div class="score-circle">
+                            <p class="score-percentage" id="totalScore">0%</p>
+                        </div>
+                        <div class="score-details">
+                            <p><strong>Total Points:</strong> <span id="totalPoints">0</span></p>
+                            <p><strong>Max Points:</strong> <span id="maxPoints">0</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Focus Areas -->
+                <div class="dashboard-card">
+                    <h3>Where to Focus</h3>
+                    <div id="focusAreas" class="focus-areas">
+                        <p class="placeholder-text">Add tasks to see focus areas</p>
+                    </div>
+                </div>
+
+                <!-- AI Suggestions -->
+                <div class="dashboard-card">
+                    <h3>🤖 AI Suggestions</h3>
+                    <div id="aiSuggestions" class="ai-suggestions">
+                        <p class="placeholder-text">Add tasks and click below for AI suggestions</p>
+                    </div>
+                    <button onclick="getAISuggestions()" class="btn btn-ai">Get AI Suggestions</button>
+                    <small class="ai-note">Uses Claude AI to provide dynamic suggestions</small>
+                </div>
+
+                <!-- Progress Tracker -->
+                <div class="dashboard-card">
+                    <h3>📈 Completion Rate</h3>
+                    <div class="progress-section">
+                        <div class="progress-item">
+                            <label>Non-Negotiables</label>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="nonNegProgressFill" style="width: 0%"></div>
+                            </div>
+                            <span id="nonNegProgress">0%</span>
+                        </div>
+                        <div class="progress-item">
+                            <label>Good to Do</label>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="goodToDoProgressFill" style="width: 0%"></div>
+                            </div>
+                            <span id="goodToDoProgress">0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Daily Summary -->
+                <div class="dashboard-card">
+                    <h3>📋 Daily Summary</h3>
+                    <div class="summary-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Completed</span>
+                            <span class="stat-value" id="completedCount">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Pending</span>
+                            <span class="stat-value" id="pendingCount">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Total Tasks</span>
+                            <span class="stat-value" id="totalTasks">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Avg Weight</span>
+                            <span class="stat-value" id="avgWeight">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reset Button -->
+            <div class="action-buttons">
+                <button onclick="resetDay()" class="btn btn-reset">Reset Day</button>
+                <button onclick="exportData()" class="btn btn-export">Export Progress</button>
+            </div>
+        </section>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script src="app.js"></script>
+    
+    <!-- Service Worker Registration for PWA -->
+    <script>
+        // Register Service Worker for offline capability
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(registration => {
+                        console.log('Service Worker registered successfully:', registration);
+                    })
+                    .catch(error => {
+                        console.log('Service Worker registration failed:', error);
+                    });
+            });
+        }
+        
+        // Install prompt handling
+        let deferredPrompt;
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            console.log('Install prompt ready');
+        });
+        
+        // iOS specific - add install instructions
+        if (navigator.userAgent.match(/iPhone|iPad|iPod/)) {
+            console.log('iOS device detected - PWA ready for installation');
+        }
+    </script>
+</body>
+</html>
